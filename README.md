@@ -56,4 +56,4 @@ This project is licensed under the GPL-3.0
 
 <h2>💖Like my work?</h2>
 
-E-mail : shopnilkarmakar1@gmail.com instagram : shopnil.k\_
+E-mail : shopnilkarmakar1@gmail.com instagram : https://www.instagram.com/shopnil.k_
