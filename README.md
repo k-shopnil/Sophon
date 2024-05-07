@@ -4,8 +4,7 @@
 
 <p id="description">This project was created by Group 4(led by Shopnil Karmakar, Marufa Yeasmin Meghla, Koushik Hasan) as a part of their presentation on Cloud Computing (CSE 231). This mini project's sole purpose is to demonstrate the capabilities of cloud computing. Feel free to further develop this program.</p>
 
-<p align="center"><img src="https://img.shields.io/badge/build-sophon-orange
-" alt="shields"></p>
+<p align="center"><img src="https://img.shields.io/badge/build-sophon-orange"alt="shields"></p>
 
   
   
