@@ -8,6 +8,7 @@ from data import *
 from math import sqrt
 from dotenv import load_dotenv
 
+
 BASE_URL="http://api.openweathermap.org/data/2.5/weather?"
 
 def config():
@@ -30,42 +31,48 @@ humidity=res['main']['humidity']
 
 bot=telebot.TeleBot(os.getenv("tele_token"))
 
+
 f = r"https://official-joke-api.appspot.com/random_ten"
 @bot.message_handler(commands=['start'])
 def start(message):
     user_id = message.from_user.id
     user_info = bot.get_chat_member(message.chat.id, user_id)
-    user_first_name = user_info.user.first_name 
+    user_first_name = user_info.user.first_name
+    print(f"status-> {user_first_name} has initiated the bot.")
     bot.reply_to(message, f"Hello {user_first_name}! I am Sophon, a Cloudbot. I'm here to offer some small help to the students of section 13. What can I assist you with today?")
-    # bot.send_message(message.chat.id, "Hello! I am Kosmic Cloudbot. I am here to help you with your cloud computing needs. How can I help you today?")
 
 @bot.message_handler(commands=['help'])
 def help(message):
-    bot.reply_to(message,"""Here's what I can do for you: 
-                 /start - Start the bot 
-                 /help - Get started with me 
+    print(f"status-> {message.from_user.first_name} accessed help menu.")
+    bot.reply_to(message,"""Here's what I can do for you:
+                 /start - Start the bot
+                 /help - Get started with me
                  /compute - Perform calculations
                  /classes - Get today's classes
                  /faculty - Get the contact information of the teachers
                  /weather - Get the current weather in Dhaka/BUBT
-                 /support - Contact the developer 
-                 /about - Learn the story behind the project 
+                 /support - Contact the developer
+                 /about - Learn the story behind the project
                  /repo - View the source code of the project""")
 
 @bot.message_handler(commands=['support'])
 def support(message):
-    bot.reply_to(message, "You can contact the developer at: https://t.me/iamkosmic")
+    print("status-> Delivering support info.")
+    bot.reply_to(message, "You can contact the developer at: \n Shopnil Karmakar : shopnilkarmakar1@gmail.com \n Koushik Hasan : mdkoushikhasan709@gmail.com ")
 
 @bot.message_handler(commands=['about'])
 def about(message):
+    print("status-> Delivering about info.")
     bot.reply_to(message, "This project was created by Group 4(led by Shopnil, Meghla, Koushik) as a part of their presentation on Cloud Comptuting. This mini project's sole purpose is to demonstrate the capabilities of cloud computing.")
 
 @bot.message_handler(commands=['repo'])
 def repo(message):
+    print(f"status-> {message.from_user.first_name} accessed the repository.")
     bot.reply_to(message, "You can view and fork the source code of this project at: https://github.com/k-shopnil/Sophon")
 
 @bot.message_handler(commands=['weather'])
 def weather(message):
+    print(f"status-> {message.from_user.first_name} requested the weather info.")
     bot.reply_to(message, f"The current temperature in Dhaka/BUBT is {temp:.0f}°C. It feels like {feels_like:.0f}°C. With a humidity of {humidity}%.")
 
 @bot.message_handler(commands=['compute'])
@@ -86,24 +93,26 @@ def compute(message):
 @bot.message_handler(commands=['classes'])
 def classes(message):
     now = datetime.datetime.now()
+    print(f"status-> {message.from_user.first_name} requested the classes info.")
     current_day = now.strftime("%A")
     if current_day == "Sunday":
         bot.reply_to(message, sunday)
-    
+
     elif current_day == "Monday":
         bot.reply_to(message, monday)
-        
+
     elif current_day == "Wednesday":
         bot.reply_to(message, wednesday)
-    
+
     elif current_day == "Thursday":
         bot.reply_to(message, thursday)
-        
+
     else:
         bot.reply_to(message,"Hooray!! No classes today. Enjoy your day off! ")
-        
+
 @bot.message_handler(commands=['faculty'])
 def faculty(message):
+    print(f"status-> {message.from_user.first_name} requested the faculty info.")
     bot.reply_to(message, ess_str)
 
 def joker():
@@ -117,18 +126,21 @@ def joker():
     #     print(i["type"])
     #     print(i["setup"])
     #     print(i["punchline"], "\n")
-
-@bot.message_handler()
+usern="kosmiccr_bot"
+@bot.message_handler(func=lambda message: usern.lower() in message.text.lower())
 def chat(message):
     message.txt=message.text.lower()
     message.txt=message.txt.replace("?", "")
+    message.txt=message.text.lower().replace(f"@{usern}", "").strip()
+
     if message.txt in ["hello","hey!","hi","hi!","hey","hello!","hi there","hi there!","hey there","hey there!","hello there","hello there!", "hi sophon","hello sophon","hey sophon","hi sophon!","hello sophon!","hey sophon!","hi sophon.","hello sophon.","hey sophon."]:
-        bot.reply_to(message, "Hello! How can I help you today?")
-    elif message.txt in ["current date", "current day","date","day","today","today's date","today's day"]:
+        bot.reply_to(message, f"Hello {message.from_user.first_name} ! How can I help you today?")
+    elif message.txt in ["current date", "current day","date","day","today","today's date","today's day","time","what's the time","what's the day","what's the date"]:
         now = datetime.datetime.now()
         current_date = now.strftime("%Y-%m-%d")
         current_day = now.strftime("%A")
         reply_message = f"The date is {current_date} and today is {current_day}."
+        print("Reporting the current date and day.")
         bot.reply_to(message, reply_message)
 
     elif message.txt in["thanks","thanks!","thank you","thank you!","thank you so much","thanks a lot","thank you very much","thanks for the help"]:
@@ -147,7 +159,7 @@ def chat(message):
         bot.reply_to(message, joker())
     else:
         bot.reply_to(message, "I am sorry, I don't understand what you are saying. Try again.")
+        print("status-> System ambiguity detected, stored the logs for further improvement.")
 
 
-    
 bot.polling()
