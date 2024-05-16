@@ -4,7 +4,7 @@
 
 <p id="description">This project was created by Group 4(led by Shopnil Karmakar, Marufa Yeasmin Meghla, Koushik Hasan) as a part of their presentation on Cloud Computing (CSE 231). This mini project's sole purpose is to demonstrate the capabilities of cloud computing. Feel free to further develop this program.</p>
 
-<p align="center"><img src="https://img.shields.io/badge/build-sophon-orange"alt="shields"></p>
+<p align="center"><img src="https://img.shields.io/badge/beta-sophon-orange"alt="shields"></p>
 
   
   
@@ -16,6 +16,8 @@ Here're some of the project's best features:
 *   Chat
 *   Data Parse
 *   Calculate
+*   Stock Prices
+*   Wiki Search
 
 <h2>🛠️ Installation Steps:</h2>
 
@@ -31,10 +33,25 @@ pip install telebot
 pip3 install python-dotenv
 ```
 
-<p>3. Install OpenAI support</p>
+<p>3. Install OpenAI dependencies</p>
 
 ```
 pip install openai
+```
+<p>4. Install Request module</p>
+
+```
+pip install requests
+```
+<p>5. Install Wikipedia library</p>
+
+```
+pip install wikipedia
+```
+<p>6. Install yFinance dependencies</p>
+
+```
+pip install yfinance
 ```
 
 <h2>🍰 Contribution Guidelines:</h2>
