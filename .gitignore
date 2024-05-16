@@ -1,3 +1,5 @@
 .env
 main_advance.py
 config.py
+gpt-integration.py
+stock_ex.py

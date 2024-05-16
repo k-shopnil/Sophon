@@ -1,4 +1,5 @@
 import telebot
+import wikipedia
 import datetime
 import requests
 import json
@@ -7,6 +8,8 @@ from config import *
 from data import *
 from math import sqrt
 from dotenv import load_dotenv
+from fin_se_price import get_current_stock_price
+from wiki import wikiengine
 
 
 BASE_URL="http://api.openweathermap.org/data/2.5/weather?"
@@ -48,6 +51,7 @@ def help(message):
                  /start - Start the bot
                  /help - Get started with me
                  /compute - Perform calculations
+                 /stock - Get the current stock price(use the ticker symbol after the command)
                  /classes - Get today's classes
                  /faculty - Get the contact information of the teachers
                  /weather - Get the current weather in Dhaka/BUBT
@@ -75,6 +79,19 @@ def weather(message):
     print(f"status-> {message.from_user.first_name} requested the weather info.")
     bot.reply_to(message, f"The current temperature in Dhaka/BUBT is {temp:.0f}°C. It feels like {feels_like:.0f}°C. With a humidity of {humidity}%.")
 
+@bot.message_handler(commands=['stock'])
+def stock(message):
+    print(f"status-> {message.from_user.first_name} requested the stock info.")
+    try:
+        ticker = message.text.split(maxsplit=1)[1]
+        current_price,company_name = get_current_stock_price(ticker)
+        rep=f"The current stock price for {company_name} is: ${current_price:.2f}"
+        bot.reply_to(message, rep)
+    except Exception as e:
+        print(f"Error: {e}")
+        responsex = "Sorry. You may check your input and try again. For example, type /stock AAPL to get the current stock price of Apple Inc."
+        bot.reply_to(message, responsex)
+        
 @bot.message_handler(commands=['compute'])
 def compute(message):
     try:
@@ -90,6 +107,16 @@ def compute(message):
         print(f"Error: {e}")
         responsex = "Sorry. You may check your input and try again. For example, type /compute 2+2 to get the result."
         bot.reply_to(message, responsex)
+
+@bot.message_handler(commands=['wiki'])
+def wiki(message):
+    wikipedia.set_lang("en")
+    topic = message.text.split(maxsplit=1)[1]
+    print(topic)
+    print(wikipedia.summary("Twitter", sentences=2))
+    #print(reply)
+    bot.reply_to(message, wikipedia.summary(topic, topic))
+
 @bot.message_handler(commands=['classes'])
 def classes(message):
     now = datetime.datetime.now()
@@ -157,7 +184,14 @@ def chat(message):
         bot.reply_to(message,f"Yes, I know you. You are {message.from_user.first_name}. Always nice to meet you!")
     elif message.txt in["tell me a joke","tell a joke","joke please","joke","another joke","one more joke","more jokes","tell me another joke","tell me one more joke","tell me more jokes","tell me a joke!","tell a joke!","joke please!","joke!","another joke!","one more joke!","more jokes!","tell me another joke!","tell me one more joke!","tell me more jokes!","another one"]:
         bot.reply_to(message, joker())
+    elif "search" in message.txt.lower():
+        print("status-> User requested a search.")
+        topic = message.text.split("search", 1)[1].strip()
+        d,l,u=wikiengine(topic)
+        dat=f"{d}.\n Learn more about {l} at http:{u}"
+        bot.reply_to(message, dat)
     else:
+        print(message.txt)
         bot.reply_to(message, "I am sorry, I don't understand what you are saying. Try again.")
         print("status-> System ambiguity detected, stored the logs for further improvement.")
 
