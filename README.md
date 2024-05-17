@@ -18,6 +18,7 @@ Here're some of the project's best features:
 *   Calculate
 *   Stock Prices
 *   Wiki Search
+*   Term Definition
 
 <h2>🛠️ Installation Steps:</h2>
 
