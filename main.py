@@ -12,18 +12,28 @@ from fin_se_price import get_current_stock_price
 from wiki import wikiengine
 from functools import wraps
 from telebot.types import Message
+# from telegram import Update
+# from telegram.ext import CallbackContext
 
 
+urlx = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
 BASE_URL="http://api.openweathermap.org/data/2.5/weather?"
+
 
 def config():
     load_dotenv()
 
 config()
+
 def ktoc(k):
     return k-273
 
+api_keyx=os.getenv("Rapid_KEY")
 
+headers = {
+	"X-RapidAPI-Key": api_keyx,
+	"X-RapidAPI-Host": "mashape-community-urban-dictionary.p.rapidapi.com"
+}
 API_KEY=os.getenv("weather_token")
 CITY="Dhaka"
 url=BASE_URL+"q="+CITY+"&appid="+API_KEY
@@ -35,6 +45,65 @@ weather=res['weather'][0]['description']
 humidity=res['main']['humidity']
 
 bot=telebot.TeleBot(os.getenv("tele_token"))
+
+#@bot.message_handler(commands=['mute'])
+#@group_chat_only
+# def mute(message: Message):
+#     #Check if the user issuing the command is an administrator
+#     print("Mute command recieved")
+#     if is_administrator(message):
+#         print("Commander is admin")
+#         #Extract the user_id to be muted from the command
+#         user_id = extract_user_id_from_command(message)
+#         print("User ID to be muted:", user_id)
+#         #Mute the user
+#         print(message.chat.id)
+#         bot.restrict_chat_member(message.chat.id, user_id, can_send_messages=False)
+#         bot.reply_to(message, f"User {user_id} has been muted in the group.")
+#     else:
+#         print("User is not an administrator.")
+
+#Function to check if the user issuing the command is an administrator
+# def is_administrator(message: Message) -> bool:
+
+#     if message.from_user and message.chat.type == "supergroup":
+#         user_id = message.from_user.id
+#         chat_id = message.chat.id
+#         chat_member = bot.get_chat_member(chat_id, user_id)
+#         print("User status:", chat_member.status)
+#         return chat_member.status in ["administrator", "creator"]
+#     return False
+
+#Function to extract the user ID from the command message
+# def extract_user_id_from_command(message: Message) -> int:
+#     print("Extracting user ID from command.")
+#     command_parts = message.text.split()
+#     print("Command parts:", command_parts)
+#     if len(command_parts) >= 2:
+#         username = command_parts[1].lstrip('@')
+#         #Extract the username and remove '@'
+#         print("Username extracted:", username)
+#         chat = bot.get_chat(username)
+#         user_id = chat.id
+#         print(user_id)
+#         return user_id
+#         # chat_id = message.chat.id
+#         # userx = bot.get_chat_member(chat_id, username)
+#         # print("User object:", userx)
+#         # user_id = userx.user.id
+#         # print("User ID:", user_id)
+#         try:
+#             userx = bot.get_chat_member(chat_id, username)
+#             print("User object:", userx)
+#             user_id = userx.user.id
+#             print("User ID:", user_id)
+#             return user_id
+#         except Exception as e:
+#             print("Error:", e)
+#             bot.reply_to(message, "User not found.")
+#             return None
+#     bot.reply_to(message, "Invalid command format. Please specify the username.")
+#     return None
 
 def group_chat_only(func):
     @wraps(func)
@@ -93,6 +162,8 @@ def weather(message):
 
 @bot.message_handler(commands=['stock'])
 def stock(message):
+    # if message.chat.type == "group" or message.chat.type == "supergroup":
+    #     message.txt=message.text.lower().replace(f"@{usern}", "").strip()
     print(f"status-> {message.from_user.first_name} requested the stock info.")
     try:
         ticker = message.text.split(maxsplit=1)[1]
@@ -103,7 +174,7 @@ def stock(message):
         print(f"Error: {e}")
         responsex = "Sorry. You may check your input and try again. For example, type /stock AAPL to get the current stock price of Apple Inc."
         bot.reply_to(message, responsex)
-        
+
 @bot.message_handler(commands=['compute'])
 def compute(message):
     try:
@@ -120,14 +191,14 @@ def compute(message):
         responsex = "Sorry. You may check your input and try again. For example, type /compute 2+2 to get the result."
         bot.reply_to(message, responsex)
 
-@bot.message_handler(commands=['wiki'])
-def wiki(message):
-    wikipedia.set_lang("en")
-    topic = message.text.split(maxsplit=1)[1]
-    print(topic)
-    print(wikipedia.summary("Twitter", sentences=2))
-    #print(reply)
-    bot.reply_to(message, wikipedia.summary(topic, topic))
+# @bot.message_handler(commands=['wiki'])
+# def wiki(message):
+#     wikipedia.set_lang("en")
+#     topic = message.text.split(maxsplit=1)[1]
+#     print(topic)
+#     print(wikipedia.summary("Twitter", sentences=2))
+#     #print(reply)
+#     bot.reply_to(message, wikipedia.summary(topic, topic))
 
 @bot.message_handler(commands=['classes'])
 @group_chat_only
@@ -178,7 +249,7 @@ def g_chat(message):
     message.txt=message.txt.replace("?", "")
     message.txt=message.text.lower().replace(f"@{usern}", "").strip()
     if usern in message.text.lower():
-        
+
         if message.txt in ["hello","hey!","hi","hi!","hey","hello!","hi there","hi there!","hey there","hey there!","hello there","hello there!", "hi sophon","hello sophon","hey sophon","hi sophon!","hello sophon!","hey sophon!","hi sophon.","hello sophon.","hey sophon."]:
             bot.reply_to(message, f"Hello {message.from_user.first_name} ! How can I help you today?")
         elif message.txt in ["current date", "current day","date","day","today","today's date","today's day","time","what's the time","what's the day","what's the date"]:
@@ -209,6 +280,18 @@ def g_chat(message):
             d,l,u=wikiengine(topic)
             dat=f"{d}.\n Learn more about {l} at http:{u}"
             bot.reply_to(message, dat)
+        elif "define" in message.txt.lower():
+            print("status-> User requested a term definition.")
+            term_index = message.txt.lower().find("define") + len("define")
+            term = message.txt[term_index:].strip()
+            querystring = {"term":term}
+            response = requests.get(urlx, headers=headers, params=querystring)
+            try:
+                ans=response.json()["list"][0]["definition"]
+                bot.reply_to(message, ans)
+            except Exception as e:
+                print("Error:", e)
+                bot.reply_to(message, "Sorry, I couldn't find anything like that. Please check for any typo/misspelling.")
         else:
             print(message.txt)
             bot.reply_to(message, "I am sorry, I don't understand what you are saying. Try again.")
@@ -253,6 +336,18 @@ def p_chat(message):
             bot.reply_to(message, dat)
         else:
             bot.reply_to(message,d)
+    elif "define" in message.txt.lower():
+        print("status-> User requested a term definition.")
+        term_index = message.txt.lower().find("define") + len("define")
+        term = message.txt[term_index:].strip()
+        querystring = {"term":term}
+        response = requests.get(urlx, headers=headers, params=querystring)
+        try:
+            ans=response.json()["list"][0]["definition"]
+            bot.reply_to(message, ans)
+        except Exception as e:
+            print("Error:", e)
+            bot.reply_to(message, "Sorry, I couldn't find anything like that. Please check for any typo/misspelling.")
     else:
         print(message.txt)
         bot.reply_to(message, "I am sorry, I don't understand what you are saying. Try again.")
