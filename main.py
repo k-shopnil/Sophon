@@ -4,6 +4,7 @@ import datetime
 import requests
 import json
 import os
+import logging
 from config import *
 from data import *
 from math import sqrt
@@ -14,6 +15,24 @@ from functools import wraps
 from telebot.types import Message
 # from telegram import Update
 # from telegram.ext import CallbackContext
+
+log_file_path = 'undefined_requests.log'
+
+if not os.path.exists(log_file_path):
+    with open(log_file_path, 'w') as f:
+        pass
+
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+def log_undefined_input(message):
+    user = message.from_user.username if message.from_user.username else message.from_user.first_name
+    logging.info(f"Undefined input from {user}: {message.text}")
+
 
 
 urlx = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
@@ -352,5 +371,6 @@ def p_chat(message):
         print(message.txt)
         bot.reply_to(message, "I am sorry, I don't understand what you are saying. Try again.")
         print("status-> System ambiguity detected, stored the logs for further improvement.")
+        log_undefined_input(message)
 
 bot.polling()
